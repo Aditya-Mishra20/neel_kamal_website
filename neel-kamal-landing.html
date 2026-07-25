@@ -360,6 +360,55 @@
     [data-reveal] { opacity: 0; transform: translateY(24px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
     [data-reveal].revealed { opacity: 1; transform: translateY(0); }
 
+    /* ---- Tab Bar ---- */
+    .tab-bar {
+      display: flex; gap: 0; margin-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 16px 24px; border: none; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted); font-family: var(--font-body);
+      font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.3s; text-align: center;
+    }
+    .tab-btn:hover { color: var(--fg); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- Masonry Grid ---- */
+    .masonry-grid {
+      column-count: 3; column-gap: 16px;
+    }
+    .masonry-item {
+      break-inside: avoid; margin-bottom: 16px;
+      border-radius: 2px; overflow: hidden;
+      opacity: 0; transform: translateY(20px);
+      transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .tab-panel.active .masonry-item { opacity: 1; transform: translateY(0); }
+    .masonry-item:nth-child(1) { transition-delay: 0.05s; }
+    .masonry-item:nth-child(2) { transition-delay: 0.1s; }
+    .masonry-item:nth-child(3) { transition-delay: 0.15s; }
+    .masonry-item:nth-child(4) { transition-delay: 0.2s; }
+    .masonry-item:nth-child(5) { transition-delay: 0.25s; }
+    .masonry-item:nth-child(6) { transition-delay: 0.3s; }
+    .masonry-item:nth-child(7) { transition-delay: 0.35s; }
+    .masonry-item:nth-child(8) { transition-delay: 0.4s; }
+    .masonry-item img {
+      width: 100%; display: block; border-radius: 2px;
+      transition: transform 0.4s, opacity 0.4s;
+    }
+    .masonry-item:hover img { transform: scale(1.03); opacity: 0.85; }
+
+    @media (max-width: 768px) {
+      .masonry-grid { column-count: 2; }
+      .tab-btn { font-size: 11px; padding: 14px 12px; }
+    }
+    @media (max-width: 480px) {
+      .masonry-grid { column-count: 1; }
+    }
+
     /* ---- Mobile Nav ---- */
     .mobile-nav {
       display: none; position: fixed; inset: 0; z-index: 999;
@@ -420,7 +469,7 @@
     <a href="#hero" class="nav-logo">Neel <span>Kamal</span> Wedding Stories</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
-      <li><a href="#impact">Work</a></li>
+      <li><a href="#craft">Work</a></li>
       <li><a href="#packages">Packages</a></li>
       <li></li>
     </ul>
@@ -433,7 +482,7 @@
     <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">×</button>
     <a href="#hero" class="mobile-nav-link" data-nav-link="">Home</a>
     <a href="#about" class="mobile-nav-link" data-nav-link="">About</a>
-    <a href="#impact" class="mobile-nav-link" data-nav-link="">Work</a>
+    <a href="#craft" class="mobile-nav-link" data-nav-link="">Work</a>
     <a href="#packages" class="mobile-nav-link" data-nav-link="">Packages</a>
     <a href="#contact" class="mobile-nav-link" data-nav-link="">Inquire</a>
   </div>
@@ -450,34 +499,51 @@
       </div>
     </section>
 
-    <!-- About / Intro Strip -->
-    <section class="section about-strip" id="about">
+    <!-- Our Craft -->
+    <section class="section about-strip" id="craft">
       <div class="section-inner">
-        <p class="section-label" data-reveal="">About Us</p>
+        <p class="section-label" data-reveal="">What We Do</p>
         <h2 class="section-title" data-reveal="">Our Craft</h2>
         <div class="gold-divider" data-reveal=""></div>
-        <p class="about-intro" data-reveal="">We are passionate photographers dedicated to capturing stunning images — professional, stunning photos tailored to showcase your story.</p>
-        <div class="services-grid">
-          <div class="service-card" data-reveal="">
-            <div class="service-icon">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-7 8-7s8 3 8 7"></path><ellipse cx="12" cy="14" rx="8" ry="3"></ellipse></svg>
-            </div>
-            <h3 class="service-name">Wedding Photography</h3>
-            <p class="service-desc">Traditional and candid captures of your ceremonial moments, from the mandap to the first dance.</p>
+        <div class="tab-bar" data-reveal="">
+          <button class="tab-btn active" data-tab="wedding">Wedding Photography</button>
+          <button class="tab-btn" data-tab="candid">Candid Photography</button>
+          <button class="tab-btn" data-tab="cinematic">Cinematic Filming</button>
+        </div>
+        <div class="tab-panel active" id="tab-wedding">
+          <div class="masonry-grid">
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80" alt="Wedding ceremony" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding rings" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80" alt="Bride portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding decor" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=800&q=80" alt="Mandap ceremony" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding venue" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1546195643-70f48f9c5b87?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding flowers" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80" alt="Wedding couple" loading="lazy"></div>
           </div>
-          <div class="service-card" data-reveal="">
-            <div class="service-icon">
-              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="16" rx="2"></rect><circle cx="12" cy="10" r="3"></circle><path d="M4 16l4-4 4 3 5-5 6 6"></path></svg>
-            </div>
-            <h3 class="service-name">Candid Photography</h3>
-            <p class="service-desc">Unposed, authentic moments that tell the real story of your celebration and joy.</p>
+        </div>
+        <div class="tab-panel" id="tab-candid">
+          <div class="masonry-grid">
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&h=900&q=80" alt="Candid laughter" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80" alt="Natural moment" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&h=900&q=80" alt="Emotional portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" alt="Joyful moment" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=600&h=900&q=80" alt="Authentic smile" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80" alt="Candid portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=900&q=80" alt="Natural beauty" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80" alt="Candid group" loading="lazy"></div>
           </div>
-          <div class="service-card" data-reveal="">
-            <div class="service-icon">
-              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="16" rx="2"></rect><circle cx="8" cy="10" r="2"></circle><path d="M10 14l6-4v8l-6-4z"></path></svg>
-            </div>
-            <h3 class="service-name">Cinematic Filming</h3>
-            <p class="service-desc">Cinematic drone shots, AI-driven editing, and beautifully edited wedding films.</p>
+        </div>
+        <div class="tab-panel" id="tab-cinematic">
+          <div class="masonry-grid">
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=800&q=80" alt="Drone shot venue" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=900&q=80" alt="Cinematic portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80" alt="Golden hour venue" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&h=900&q=80" alt="Cinematic bride" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1444021465936-c6ca81d39b84?auto=format&fit=crop&w=800&q=80" alt="Aerial wedding" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1546195643-70f48f9c5b87?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding bouquet" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1510076857177-7470076d4098?auto=format&fit=crop&w=600&h=900&q=80" alt="Cinematic decor" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=800&q=80" alt="Drone landscape" loading="lazy"></div>
           </div>
         </div>
       </div>
@@ -497,6 +563,33 @@
           <div class="stat" data-reveal="">
             <div class="stat-number" data-count="98" data-suffix="%">0</div>
             <div class="stat-label">Clients satisfied with our exceptional service and quality</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Us -->
+    <section class="section about-strip" id="about">
+      <div class="section-inner">
+        <p class="section-label" data-reveal="">About Us</p>
+        <h2 class="section-title" data-reveal="">The Neel Kamal Legacy</h2>
+        <div class="gold-divider" data-reveal=""></div>
+        <p class="about-intro" data-reveal="">We are passionate photographers dedicated to capturing stunning images — professional, stunning photos tailored to showcase your story.</p>
+        <div class="journey-grid">
+          <div class="journey-text" data-reveal="">
+            <p>At Neel Kamal Wedding Stories, we believe every love story is unique — and your wedding photos should reflect that.</p>
+            <p>For over <span class="highlight">50 years</span>, we have blended candid storytelling with elegant portraiture, capturing weddings across Rajasthan with a warm, authentic, and timeless style.</p>
+            <p>From the gentle glow of diyas to the vibrant marigold arches, our lens finds the moments that matter most.</p>
+            <div class="team-strip">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
+            </div>
+            <p class="team-label">The Real People Behind the Lens</p>
+            <div class="extra-callout">We also offer Album Designing &amp; Printing, Maternity &amp; Baby Shoots. <a href="#contact" style="color:var(--accent);text-decoration:none;">Know more.</a></div>
+          </div>
+          <div class="journey-img" data-reveal="">
+            <div class="img-placeholder">Wedding Portrait</div>
           </div>
         </div>
       </div>
@@ -576,31 +669,6 @@
       </div>
     </section>
 
-    <!-- Our Journey -->
-    <section class="section journey" id="about-journey">
-      <div class="section-inner">
-        <p class="section-label" data-reveal="">Our Journey</p>
-        <h2 class="section-title" data-reveal="">The Neel Kamal Legacy</h2>
-        <div class="gold-divider" data-reveal=""></div>
-        <div class="journey-grid">
-          <div class="journey-text" data-reveal="">
-            <p>At Neel Kamal Wedding Stories, we believe every love story is unique — and your wedding photos should reflect that.</p>
-            <p>For over <span class="highlight">50 years</span>, we have blended candid storytelling with elegant portraiture, capturing weddings across Rajasthan with a warm, authentic, and timeless style.</p>
-            <p>From the gentle glow of diyas to the vibrant marigold arches, our lens finds the moments that matter most.</p>
-            <div class="team-strip">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
-            </div>
-            <p class="team-label">The Real People Behind the Lens</p>
-            <div class="extra-callout">We also offer Album Designing &amp; Printing, Maternity &amp; Baby Shoots. <a href="#contact" style="color:var(--accent);text-decoration:none;">Know more.</a></div>
-          </div>
-          <div class="journey-img" data-reveal="">
-            <div class="img-placeholder">Wedding Portrait</div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- Contact -->
     <section class="section contact" id="contact">
@@ -669,7 +737,7 @@
       <div>
         <ul class="footer-links">
           <li><a href="#about">About</a></li>
-          <li><a href="#impact">Work</a></li>
+          <li><a href="#craft">Work</a></li>
           <li><a href="#packages">Packages</a></li>
           <li><a href="#contact">Inquire</a></li>
         </ul>
@@ -775,6 +843,18 @@
           setTimeout(function () { msg.value = saved; msg.style.color = ''; }, 3500);
         }
         form.reset();
+      });
+
+      /* ---- Tab Switching ---- */
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tab = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+          document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+          btn.classList.add('active');
+          document.getElementById('tab-' + tab).classList.add('active');
+        });
       });
 
       /* ---- Smooth scroll for anchor links ---- */
