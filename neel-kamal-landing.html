@@ -395,6 +395,9 @@
     .masonry-item:nth-child(6) { transition-delay: 0.3s; }
     .masonry-item:nth-child(7) { transition-delay: 0.35s; }
     .masonry-item:nth-child(8) { transition-delay: 0.4s; }
+    .masonry-item {
+      cursor: pointer;
+    }
     .masonry-item img {
       width: 100%; display: block; border-radius: 2px;
       transition: transform 0.4s, opacity 0.4s;
@@ -407,6 +410,70 @@
     }
     @media (max-width: 480px) {
       .masonry-grid { column-count: 1; }
+    }
+
+    /* ---- Modal Gallery ---- */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(14,11,10,0.95);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-content {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      position: relative; width: 100%;
+    }
+    .modal-image {
+      max-height: 72vh; max-width: 90vw; object-fit: contain;
+      border-radius: 4px; border: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.open .modal-image { animation: modalFadeIn 0.3s ease; }
+    @keyframes modalFadeIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-nav {
+      position: fixed; top: 50%; transform: translateY(-50%); z-index: 2001;
+      background: none; border: none; color: var(--accent);
+      font-size: 48px; cursor: pointer; padding: 16px;
+      transition: all 0.3s; line-height: 1;
+    }
+    .modal-nav:hover { filter: drop-shadow(0 0 10px var(--accent)); color: var(--fg); }
+    .modal-prev { left: 16px; }
+    .modal-next { right: 16px; }
+    .modal-close {
+      position: fixed; top: 16px; right: 24px; z-index: 2001;
+      background: none; border: none; color: var(--muted);
+      font-size: 36px; cursor: pointer; transition: color 0.3s; line-height: 1;
+    }
+    .modal-close:hover { color: var(--fg); }
+    .modal-thumbnails {
+      display: flex; gap: 8px; justify-content: center; align-items: center;
+      padding: 12px 16px; max-width: 90vw; overflow-x: auto;
+      scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+    }
+    .modal-thumbnails::-webkit-scrollbar { height: 4px; }
+    .modal-thumbnails::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    .modal-thumb {
+      width: 56px; height: 56px; object-fit: cover; border-radius: 4px;
+      border: 2px solid transparent; cursor: pointer; opacity: 0.5;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .modal-thumb:hover { opacity: 0.8; }
+    .modal-thumb.active { border-color: var(--accent); opacity: 1; transform: scale(1.05); }
+
+    @media (max-width: 768px) {
+      .modal-nav { font-size: 36px; padding: 12px; }
+      .modal-prev { left: 8px; }
+      .modal-next { right: 8px; }
+      .modal-image { max-height: 62vh; }
+      .modal-thumb { width: 48px; height: 48px; }
+      .modal-close { font-size: 30px; top: 12px; right: 16px; }
+    }
+    @media (max-width: 480px) {
+      .modal-nav { font-size: 28px; padding: 8px; }
+      .modal-image { max-height: 50vh; max-width: 95vw; }
+      .modal-thumb { width: 40px; height: 40px; }
+      .modal-thumbnails { gap: 6px; padding: 8px; }
     }
 
     /* ---- Mobile Nav ---- */
@@ -719,6 +786,17 @@
         </div>
       </div>
     </section>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay" id="image-modal">
+      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <button class="modal-nav modal-prev" id="modal-prev" aria-label="Previous">‹</button>
+      <button class="modal-nav modal-next" id="modal-next" aria-label="Next">›</button>
+      <div class="modal-content">
+        <img class="modal-image" id="modal-image" src="" alt="">
+        <div class="modal-thumbnails" id="modal-thumbnails"></div>
+      </div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -855,6 +933,89 @@
           btn.classList.add('active');
           document.getElementById('tab-' + tab).classList.add('active');
         });
+      });
+
+      /* ---- Modal Gallery ---- */
+      var modalOverlay = document.getElementById('image-modal');
+      var modalImage = document.getElementById('modal-image');
+      var modalThumbnails = document.getElementById('modal-thumbnails');
+      var modalPrev = document.getElementById('modal-prev');
+      var modalNext = document.getElementById('modal-next');
+      var modalClose = document.getElementById('modal-close');
+      var modalImages = [];
+      var modalIndex = 0;
+
+      document.querySelectorAll('.masonry-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+          var panel = item.closest('.tab-panel');
+          if (!panel) return;
+          var imgs = panel.querySelectorAll('.masonry-item img');
+          modalImages = [];
+          imgs.forEach(function (img) { modalImages.push(img.getAttribute('src')); });
+          var items = panel.querySelectorAll('.masonry-item');
+          items.forEach(function (ci, i) { if (ci === item) modalIndex = i; });
+          openModal();
+        });
+      });
+
+      function openModal() {
+        if (modalImages.length === 0) return;
+        updateModalImage();
+        buildThumbnails();
+        modalOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modalOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function updateModalImage() {
+        modalImage.setAttribute('src', modalImages[modalIndex]);
+        var thumbs = modalThumbnails.querySelectorAll('.modal-thumb');
+        thumbs.forEach(function (t, i) {
+          t.classList.toggle('active', i === modalIndex);
+          if (i === modalIndex) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        });
+      }
+
+      function buildThumbnails() {
+        modalThumbnails.innerHTML = '';
+        modalImages.forEach(function (src, i) {
+          var thumb = document.createElement('img');
+          thumb.setAttribute('src', src);
+          thumb.setAttribute('data-index', i);
+          thumb.className = 'modal-thumb' + (i === modalIndex ? ' active' : '');
+          thumb.addEventListener('click', function () {
+            modalIndex = parseInt(thumb.getAttribute('data-index'), 10);
+            updateModalImage();
+          });
+          modalThumbnails.appendChild(thumb);
+        });
+      }
+
+      function prevImage() {
+        modalIndex = (modalIndex - 1 + modalImages.length) % modalImages.length;
+        updateModalImage();
+      }
+
+      function nextImage() {
+        modalIndex = (modalIndex + 1) % modalImages.length;
+        updateModalImage();
+      }
+
+      modalPrev.addEventListener('click', prevImage);
+      modalNext.addEventListener('click', nextImage);
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function (e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!modalOverlay.classList.contains('open')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
       });
 
       /* ---- Smooth scroll for anchor links ---- */
