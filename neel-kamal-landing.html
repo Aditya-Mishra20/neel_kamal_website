@@ -316,6 +316,201 @@
       .testimonial-image-wrap { max-width: 180px; }
     }
 
+    /* ---- Instagram ---- */
+    .instagram { background: var(--surface); }
+    .instagram-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 40px;
+    }
+    .instagram-title {
+      font-family: var(--font-display); font-size: clamp(28px, 4vw, 44px);
+      font-weight: 400; color: var(--fg); margin-bottom: 8px;
+    }
+    .instagram-handle {
+      font-size: 12px; font-weight: 400; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .instagram-follow-btn {
+      display: inline-block; padding: 10px 28px;
+      border: 1px solid var(--accent); color: var(--accent);
+      background: transparent; border-radius: 2px;
+      font-family: var(--font-body); font-size: 12px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; cursor: pointer; transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .instagram-follow-btn:hover { background: var(--accent); color: var(--bg); }
+    .instagram-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .instagram-card {
+      aspect-ratio: 1/1;
+      border: none; padding: 0; background: none;
+      overflow: hidden; cursor: pointer; position: relative;
+    }
+    .instagram-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s, opacity 0.5s;
+    }
+    .instagram-card:hover img { transform: scale(1.08); opacity: 0.85; }
+    @media (max-width: 1024px) {
+      .instagram-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .instagram-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .instagram-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ---- Instagram Modal ---- */
+    .ig-modal-overlay {
+      position: fixed; inset: 0; z-index: 2500;
+      background: rgba(14,11,10,0.96);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    .ig-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .ig-modal {
+      position: relative; width: 100%; max-width: 1080px; max-height: 92vh;
+      display: grid; grid-template-columns: 7fr 5fr;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      transform: translateY(20px) scale(0.98);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .ig-modal-overlay.open .ig-modal { transform: translateY(0) scale(1); }
+    .ig-close {
+      position: absolute; top: 12px; right: 12px; z-index: 30;
+      background: rgba(14,11,10,0.7); border: 1px solid var(--border);
+      color: var(--fg); width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .ig-close:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .ig-image-col {
+      position: relative; background: #0a0808;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 420px; overflow: hidden;
+    }
+    .ig-image-col img {
+      max-height: 82vh; width: auto; max-width: 100%;
+      object-fit: contain; transition: transform 0.3s ease-out;
+    }
+    .ig-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
+      background: none; border: none; color: var(--accent);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s; opacity: 0.6;
+    }
+    .ig-arrow:hover { opacity: 1; color: var(--fg); }
+    .ig-arrow-prev { left: 8px; }
+    .ig-arrow-next { right: 8px; }
+    .ig-counter {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(14,11,10,0.7); border: 1px solid var(--border);
+      backdrop-filter: blur(8px); padding: 6px 14px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); white-space: nowrap;
+    }
+    .ig-details {
+      display: flex; flex-direction: column; min-height: 0;
+      background: var(--surface); border-left: 1px solid var(--border);
+    }
+    .ig-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .ig-avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      border: 1px solid var(--accent); padding: 2px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ig-avatar-inner {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: linear-gradient(135deg, var(--maroon), var(--ruby));
+      color: var(--accent); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; display: flex; align-items: center; justify-content: center;
+    }
+    .ig-username {
+      font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--fg); line-height: 1.3;
+    }
+    .ig-location {
+      font-family: var(--font-display); font-size: 12px; font-style: italic;
+      color: var(--muted); line-height: 1.3;
+    }
+    .ig-follow {
+      margin-left: auto; background: none; border: none; cursor: pointer;
+      color: var(--accent); font-size: 12px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.3s;
+    }
+    .ig-follow:hover { color: var(--fg); }
+    .ig-follow.following { color: var(--muted); }
+    .ig-body {
+      flex: 1; overflow-y: auto; padding: 20px;
+      scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+    }
+    .ig-body::-webkit-scrollbar { width: 4px; }
+    .ig-body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    .ig-post-title {
+      font-family: var(--font-display); font-size: 20px; font-style: italic;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .ig-caption {
+      font-size: 14px; font-weight: 300; line-height: 1.75;
+      color: var(--muted); margin-bottom: 20px;
+    }
+    .ig-comment { display: flex; gap: 10px; margin-bottom: 16px; }
+    .ig-comment-avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent-dim); border: 1px solid var(--border);
+    }
+    .ig-comment-user {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      color: var(--fg); margin-bottom: 2px;
+    }
+    .ig-comment-text { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; margin-bottom: 4px; }
+    .ig-comment-time { font-size: 10px; letter-spacing: 0.08em; color: var(--muted); opacity: 0.7; }
+    .ig-actions {
+      padding: 16px 20px; border-top: 1px solid var(--border);
+      background: rgba(26,20,18,0.6);
+    }
+    .ig-icon-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .ig-icons { display: flex; align-items: center; gap: 18px; }
+    .ig-icon {
+      background: none; border: none; color: var(--accent); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 2px;
+      transition: all 0.25s;
+    }
+    .ig-icon:hover { transform: scale(1.15); }
+    .ig-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .ig-icon.liked svg { fill: #E0245E; stroke: #E0245E; animation: igPop 0.3s ease; }
+    @keyframes igPop { 0% { transform: scale(0.6); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .ig-likes { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: var(--fg); margin-bottom: 14px; }
+    .ig-view-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px; text-decoration: none;
+      background: var(--maroon); color: var(--fg); border: 1px solid var(--border);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      transition: all 0.4s;
+    }
+    .ig-view-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .ig-view-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    @media (max-width: 768px) {
+      .ig-modal-overlay { padding: 0; }
+      .ig-modal {
+        grid-template-columns: 1fr; grid-template-rows: 40vh 60vh;
+        max-height: 100vh; border-radius: 0; border: none;
+      }
+      .ig-image-col { min-height: 0; height: 100%; }
+      .ig-image-col img { max-height: 100%; }
+      .ig-details { border-left: none; border-top: 1px solid var(--border); }
+      .ig-close { top: 10px; right: 10px; }
+      .ig-counter { bottom: 12px; }
+    }
+
     /* ---- Journey ---- */
     .journey { background: var(--surface); }
     .journey-grid {
@@ -843,6 +1038,39 @@
       </div>
     </section>
 
+    <!-- Instagram -->
+    <section class="section instagram" id="instagram">
+      <div class="section-inner">
+        <div class="instagram-header">
+          <div>
+            <h2 class="instagram-title">Check Out Our Instagram</h2>
+            <p class="instagram-handle">@neelkamalweddingstories</p>
+          </div>
+          <a href="https://instagram.com/neelkamalweddingstories" target="_blank" rel="noopener" class="instagram-follow-btn">Follow Us</a>
+        </div>
+        <div class="instagram-grid">
+          <button class="instagram-card" aria-label="View post" data-location="The Rambagh Palace, Jaipur" data-title="Capturing the Eternal Glow" data-caption="A timeless frame from the royal nuptials at Rambagh Palace. Every stitch of the heritage lehenga tells a story of generations past. #WeddingPhotography #RoyalWedding #JaipurHeritage">
+            <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Udaipur, Lake Pichola" data-title="Two Rings, One Promise" data-caption="The rings that began it all — a quiet moment of gold and light before the ceremony began. #WeddingRings #Udaipur #ForeverStartsHere">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="The Oberoi, New Delhi" data-title="The Bride in Bloom" data-caption="A portrait study of the bride — soft window light, heirloom jewels, and the calm before the celebration. #BridePortrait #GoldenHour #WeddingEditorial">
+            <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Haveli Courtyard, Jaipur" data-title="Details of a Dream" data-caption="Marigold, rose and hand-worked silk — every detail of the decor was a labour of love. #WeddingDecor #DestinationWedding #IndianWedding">
+            <img src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Village Garden, Goa" data-title="Petals and Promises" data-caption="Soft morning light across the floral altar — the kind of frame you feel before you photograph. #WeddingFlowers #BohoWedding #GoaWedding">
+            <img src="https://images.unsplash.com/photo-1546195643-70f48f9c5b87?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Fort Grounds, Jodhpur" data-title="A Grand Welcome" data-caption="Aerial view of the mandap at golden hour — from above, a wedding looks like a work of art. #DroneWedding #AerialPhotography #Jodhpur">
+            <img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+        </div>
+      </div>
+    </section>
+
 
     <!-- Contact -->
     <section class="section contact" id="contact">
@@ -902,6 +1130,78 @@
       <div class="modal-content">
         <img class="modal-image" id="modal-image" src="" alt="">
         <div class="modal-thumbnails" id="modal-thumbnails"></div>
+      </div>
+    </div>
+
+    <!-- Instagram Modal -->
+    <div class="ig-modal-overlay" id="ig-modal" role="dialog" aria-label="Instagram post">
+      <div class="ig-modal">
+        <button class="ig-close" id="ig-close" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="ig-image-col">
+          <button class="ig-arrow ig-arrow-prev" id="ig-prev" aria-label="Previous">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="ig-arrow ig-arrow-next" id="ig-next" aria-label="Next">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <img id="ig-image" src="" alt="Instagram post">
+          <div class="ig-counter"><span id="ig-counter-text">Image 1/6</span></div>
+        </div>
+        <div class="ig-details">
+          <div class="ig-header">
+            <div class="ig-avatar"><div class="ig-avatar-inner">NK</div></div>
+            <div>
+              <div class="ig-username">neelkamalweddingstories</div>
+              <div class="ig-location" id="ig-location">Jaipur, India</div>
+            </div>
+            <button class="ig-follow" id="ig-follow">Follow</button>
+          </div>
+          <div class="ig-body">
+            <h2 class="ig-post-title" id="ig-title">Capturing the Eternal Glow</h2>
+            <p class="ig-caption" id="ig-caption">Every frame tells a story of generations past.</p>
+            <div class="ig-comment">
+              <div class="ig-comment-avatar"></div>
+              <div>
+                <div class="ig-comment-user">VOGUEWEDDINGS</div>
+                <div class="ig-comment-text">The composition and lighting here are absolutely peerless. Truly captured the soul of Rajasthan.</div>
+                <div class="ig-comment-time">2H AGO &bull; REPLY</div>
+              </div>
+            </div>
+            <div class="ig-comment">
+              <div class="ig-comment-avatar"></div>
+              <div>
+                <div class="ig-comment-user">HERITAGE_ARCHIVE</div>
+                <div class="ig-comment-text">Exceptional work, Neel. The gold thread detail is incredible.</div>
+                <div class="ig-comment-time">5H AGO &bull; REPLY</div>
+              </div>
+            </div>
+          </div>
+          <div class="ig-actions">
+            <div class="ig-icon-row">
+              <div class="ig-icons">
+                <button class="ig-icon" id="ig-like" aria-label="Like">
+                  <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </button>
+                <button class="ig-icon" aria-label="Comment">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </button>
+                <button class="ig-icon" aria-label="Share">
+                  <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+              </div>
+              <button class="ig-icon" id="ig-bookmark" aria-label="Save">
+                <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              </button>
+            </div>
+            <p class="ig-likes" id="ig-likes">1,428 LIKES</p>
+            <a class="ig-view-btn" href="https://instagram.com/neelkamalweddingstories" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+              View On Instagram
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -1148,6 +1448,100 @@
         dot.addEventListener('click', function () {
           testShow(parseInt(dot.getAttribute('data-index'), 10));
         });
+      });
+
+      /* ---- Instagram Modal ---- */
+      var igOverlay = document.getElementById('ig-modal');
+      var igImage = document.getElementById('ig-image');
+      var igLocation = document.getElementById('ig-location');
+      var igTitle = document.getElementById('ig-title');
+      var igCaption = document.getElementById('ig-caption');
+      var igCounter = document.getElementById('ig-counter-text');
+      var igPrev = document.getElementById('ig-prev');
+      var igNext = document.getElementById('ig-next');
+      var igClose = document.getElementById('ig-close');
+      var igFollow = document.getElementById('ig-follow');
+      var igLike = document.getElementById('ig-like');
+      var igBookmark = document.getElementById('ig-bookmark');
+      var igLikes = document.getElementById('ig-likes');
+      var igFrame = document.querySelector('#ig-modal .ig-image-col');
+      var igCards = document.querySelectorAll('.instagram-card');
+      var igData = [];
+      var igIndex = 0;
+      var igLiked = false;
+
+      igCards.forEach(function (card) {
+        igData.push({
+          src: card.querySelector('img').getAttribute('src'),
+          location: card.getAttribute('data-location') || 'Jaipur, India',
+          title: card.getAttribute('data-title') || 'Capturing Moments of Love',
+          caption: card.getAttribute('data-caption') || 'Every frame tells a story of generations past.'
+        });
+      });
+
+      function igOpen(index) {
+        if (igData.length === 0) return;
+        igIndex = index;
+        igUpdate();
+        igOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function igCloseModal() {
+        igOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function igUpdate() {
+        var d = igData[igIndex];
+        igImage.setAttribute('src', d.src);
+        igLocation.textContent = d.location;
+        igTitle.textContent = d.title;
+        igCaption.textContent = d.caption;
+        igCounter.textContent = 'Image ' + (igIndex + 1) + '/' + igData.length;
+      }
+
+      function igPrevImage() { igIndex = (igIndex - 1 + igData.length) % igData.length; igUpdate(); }
+      function igNextImage() { igIndex = (igIndex + 1) % igData.length; igUpdate(); }
+
+      igCards.forEach(function (card, i) {
+        card.addEventListener('click', function () { igOpen(i); });
+      });
+      igPrev.addEventListener('click', igPrevImage);
+      igNext.addEventListener('click', igNextImage);
+      igClose.addEventListener('click', igCloseModal);
+      igOverlay.addEventListener('click', function (e) {
+        if (e.target === igOverlay) igCloseModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!igOverlay.classList.contains('open')) return;
+        if (e.key === 'Escape') igCloseModal();
+        if (e.key === 'ArrowLeft') igPrevImage();
+        if (e.key === 'ArrowRight') igNextImage();
+      });
+
+      igFollow.addEventListener('click', function () {
+        var following = igFollow.classList.toggle('following');
+        igFollow.textContent = following ? 'Following' : 'Follow';
+      });
+      igLike.addEventListener('click', function () {
+        igLiked = !igLiked;
+        igLike.classList.toggle('liked', igLiked);
+        igLikes.textContent = igLiked ? '1,429 LIKES' : '1,428 LIKES';
+      });
+      igBookmark.addEventListener('click', function () {
+        igBookmark.classList.toggle('liked');
+      });
+
+      var igImg = igFrame.querySelector('img');
+      igFrame.addEventListener('mousemove', function (e) {
+        var rect = igFrame.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width - 0.5;
+        var y = (e.clientY - rect.top) / rect.height - 0.5;
+        igImg.style.transform = 'scale(1.02) translate(' + (x * 10) + 'px,' + (y * 10) + 'px)';
+      });
+      igFrame.addEventListener('mouseleave', function () {
+        igImg.style.transform = '';
       });
 
       /* ---- Smooth scroll for anchor links ---- */
