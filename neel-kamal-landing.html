@@ -250,17 +250,17 @@
     }
     .testimonial-slide {
       min-width: 100%; width: 100%; flex-shrink: 0;
-      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      display: grid; grid-template-columns: 1fr; gap: 20px;
       text-align: center; box-sizing: border-box; padding: 0 24px;
     }
-    .testimonial-slide > div {
-      width: 100%; max-width: 600px;
+    .testimonial-content {
+      width: 100%; max-width: 600px; margin: 0 auto;
     }
     .testimonial-image-wrap {
-      aspect-ratio: 1/1; border-radius: 50%; overflow: hidden;
-      max-width: 140px; margin: 0 auto;
-      border: 2px solid var(--border);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      aspect-ratio: 3/4; border-radius: 16px; overflow: hidden;
+      max-width: 200px; margin: 0 auto;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .testimonial-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
     .testimonial-label {
@@ -303,9 +303,18 @@
       transition: all 0.3s; padding: 0;
     }
     .testimonial-dot.active { background: var(--accent); transform: scale(1.2); }
+    @media (min-width: 768px) {
+      .testimonial-slide {
+        display: flex; justify-content: center; align-items: center;
+        gap: 48px; text-align: left; padding: 0;
+      }
+      .testimonial-image-wrap { flex-shrink: 0; max-width: 260px; margin: 0; }
+      .testimonial-content { max-width: 560px; margin: 0; text-align: left; }
+      .testimonial-text { margin: 0 0 16px; }
+    }
     @media (max-width: 767px) {
       .testimonial-arrow { width: 36px; height: 36px; }
-      .testimonial-image-wrap { max-width: 110px; }
+      .testimonial-image-wrap { max-width: 180px; }
     }
 
     /* ---- Journey ---- */
@@ -786,7 +795,7 @@
               <div class="testimonial-image-wrap">
                 <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&h=750&q=80" alt="Lokesh Sharma" loading="lazy">
               </div>
-              <div>
+              <div class="testimonial-content">
                 <div class="testimonial-quote">"The photos exceeded my expectations! Every detail was perfectly captured, and the quality was outstanding."</div>
                 <p class="testimonial-text">The team was professional, friendly and made the entire process enjoyable. Highly recommend!</p>
                 <div class="testimonial-author">— Lokesh Sharma, Business Owner</div>
@@ -796,7 +805,7 @@
               <div class="testimonial-image-wrap">
                 <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=750&q=80" alt="Ananya Singh" loading="lazy">
               </div>
-              <div>
+              <div class="testimonial-content">
                 <div class="testimonial-quote">"The attention to detail and the way they handled the lighting during our sunset ceremony was magical. They are truly masters of their craft."</div>
                 <p class="testimonial-text">From the first consultation to the final delivery, everything was flawless. We felt like royalty.</p>
                 <div class="testimonial-author">— Ananya Singh, Jaipur</div>
@@ -806,7 +815,7 @@
               <div class="testimonial-image-wrap">
                 <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&h=750&q=80" alt="Priya and Rahul" loading="lazy">
               </div>
-              <div>
+              <div class="testimonial-content">
                 <div class="testimonial-quote">"They captured every emotion perfectly — from the nervous excitement before the pheras to the joy of the celebration."</div>
                 <p class="testimonial-text">Our family treasures these memories. The candid shots of our parents' reactions are priceless.</p>
                 <div class="testimonial-author">— Priya &amp; Rahul, Udaipur</div>
