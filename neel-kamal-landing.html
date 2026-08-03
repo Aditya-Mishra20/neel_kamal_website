@@ -37,6 +37,22 @@
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
+    body.loading { overflow: hidden; }
+
+    /* ---- Intro Preloader ---- */
+    .preloader {
+      position: fixed; inset: 0; z-index: 5000;
+      display: none; align-items: center; justify-content: center;
+      background: #000; overflow: hidden;
+      opacity: 1; transition: opacity 0.7s ease;
+    }
+    html.intro .preloader { display: flex; }
+    .preloader.done { opacity: 0; pointer-events: none; }
+    .preloader-video {
+      width: min(100%, 480px);
+      height: auto; aspect-ratio: 16 / 9;
+      object-fit: contain; background: #000;
+    }
 
     /* ---- Navigation ---- */
     .nav {
@@ -51,12 +67,10 @@
       box-shadow: 0 1px 0 var(--border);
     }
     .nav-logo {
-      font-family: 'Rouge Script', cursive;
-      font-size: 26px; font-weight: 400;
-      letter-spacing: 0.02em; text-transform: none;
-      color: #F4EBE0;
-      text-decoration: none; white-space: nowrap;
+      display: flex; align-items: center;
+      text-decoration: none; line-height: 1;
     }
+    .nav-logo-img { height: 42px; width: auto; display: block; }
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a {
       color: var(--fg); text-decoration: none; font-size: 14px;
@@ -785,7 +799,7 @@
       .hero-title { font-size: clamp(32px, 8vw, 56px); }
     }
     @media (min-width: 768px) {
-      .nav-logo { font-size: 32px; }
+      .nav-logo-img { height: 52px; }
     }
     @media (max-width: 480px) {
       .nav { padding: 0 16px; }
@@ -804,9 +818,25 @@
 </head>
 <body>
 
+  <script>
+    try {
+      if (!localStorage.getItem('nk-ws-intro')) {
+        document.documentElement.classList.add('intro');
+        document.body.classList.add('loading');
+      }
+    } catch (e) {}
+  </script>
+
+  <!-- Intro Preloader (first visit only) -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <video class="preloader-video" id="preloader-video" autoplay muted playsinline preload="auto" src="logo_intro.mp4"></video>
+  </div>
+
   <!-- Navigation -->
   <nav class="nav" data-nav="" id="main-nav">
-    <a href="#hero" class="nav-logo">Neel Kamal Wedding Stories</a>
+    <a href="#hero" class="nav-logo">
+      <img class="nav-logo-img" src="logo.png" alt="Neel Kamal Wedding Stories">
+    </a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#craft">Work</a></li>
@@ -1258,6 +1288,39 @@
 
   <script>
     (function () {
+      /* ---- Intro Preloader (first visit only) ---- */
+      var preloader = document.getElementById('preloader');
+      var introVideo = document.getElementById('preloader-video');
+      var isIntro = document.documentElement.classList.contains('intro');
+
+      function finishIntro() {
+        if (!preloader || preloader.classList.contains('done')) return;
+        preloader.classList.add('done');
+        document.body.classList.remove('loading');
+        try { localStorage.setItem('nk-ws-intro', '1'); } catch (e) {}
+        setTimeout(function () {
+          if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader);
+        }, 800);
+      }
+
+      if (isIntro) {
+        var introStarted = false;
+        function startIntro() {
+          if (introStarted) return;
+          introStarted = true;
+          if (!introVideo) { finishIntro(); return; }
+          var p = introVideo.play();
+          if (p && p.catch) p.catch(function () { finishIntro(); });
+        }
+        introVideo.addEventListener('canplay', startIntro, { once: true });
+        introVideo.addEventListener('ended', finishIntro, { once: true });
+        introVideo.addEventListener('error', finishIntro, { once: true });
+        setTimeout(startIntro, 150);
+        setTimeout(finishIntro, 11500);
+      } else if (document.body.classList.contains('loading')) {
+        document.body.classList.remove('loading');
+      }
+
       var nav = document.getElementById('main-nav');
       var mobileNav = document.getElementById('mobile-nav');
       var navToggle = document.getElementById('nav-toggle');
