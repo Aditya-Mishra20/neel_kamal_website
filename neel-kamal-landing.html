@@ -748,7 +748,7 @@
 
     /* ---- Mobile Nav ---- */
     .mobile-nav {
-      display: none; position: fixed; inset: 0; z-index: 999;
+      display: none; position: fixed; inset: 0; z-index: 1500;
       background: rgba(14,11,10,0.96); backdrop-filter: blur(20px);
       flex-direction: column; align-items: center; justify-content: center; gap: 32px;
     }
@@ -758,7 +758,7 @@
       text-decoration: none; letter-spacing: 0.04em; transition: color 0.3s;
     }
     .mobile-nav a:hover { color: var(--accent); }
-    .mobile-nav-close { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--fg); font-size: 28px; cursor: pointer; }
+    .mobile-nav-close { position: absolute; top: 24px; right: 24px; z-index: 10; background: none; border: none; color: var(--fg); font-size: 28px; cursor: pointer; }
 
     /* ---- Counter animation ---- */
     .stat-number[data-count] { font-variant-numeric: tabular-nums; }
@@ -806,7 +806,7 @@
 
   <!-- Navigation -->
   <nav class="nav" data-nav="" id="main-nav">
-    <a href="#hero" class="nav-logo">NeelKamal Wedding Stories</a>
+    <a href="#hero" class="nav-logo">Neel Kamal Wedding Stories</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#craft">Work</a></li>
@@ -919,7 +919,7 @@
         <div class="journey-grid">
           <div class="journey-text" data-reveal="">
             <p>At Neel Kamal Wedding Stories, we believe every love story is unique — and your wedding photos should reflect that.</p>
-            <p>For over <span class="highlight">50 years</span>, we have blended candid storytelling with elegant portraiture, capturing weddings across Rajasthan with a warm, authentic, and timeless style.</p>
+            <p>For over <span class="highlight">50 years</span>, we have blended candid storytelling with elegant portraiture, capturing weddings across India with a warm, authentic, and timeless style.</p>
             <p>From the gentle glow of diyas to the vibrant marigold arches, our lens finds the moments that matter most.</p>
             <div class="team-strip">
               <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
@@ -1059,9 +1059,9 @@
         <div class="instagram-header">
           <div>
             <h2 class="instagram-title">Check Out Our Instagram</h2>
-            <p class="instagram-handle">@neelkamalweddingstories</p>
+            <p class="instagram-handle">@weddingsbyneelkamal</p>
           </div>
-          <a href="https://instagram.com/neelkamalweddingstories" target="_blank" rel="noopener" class="instagram-follow-btn">Follow Us</a>
+          <a href="https://instagram.com/weddingsbyneelkamal" target="_blank" rel="noopener" class="instagram-follow-btn">Follow Us</a>
         </div>
         <div class="instagram-grid">
           <button class="instagram-card" aria-label="View post" data-location="The Rambagh Palace, Jaipur" data-title="Capturing the Eternal Glow" data-caption="A timeless frame from the royal nuptials at Rambagh Palace. Every stitch of the heritage lehenga tells a story of generations past. #WeddingPhotography #RoyalWedding #JaipurHeritage">
@@ -1095,7 +1095,7 @@
         <div class="gold-divider" data-reveal=""></div>
         <div class="contact-layout">
           <div class="contact-info" data-reveal="">
-            <p>Have a question or want to book a media session with us? Send a text, give us a call, email us at <a href="mailto:weddingsbyneelkamal@gmail.com" class="contact-email">weddingsbyneelkamal@gmail.com</a>, or submit the form below. We're looking forward to hearing from you!</p>
+            <p>Have a question or want to book a media session with us? Send a text, give us a call, email us at <a href="mailto:neelkamalweddingstories@gmail.com" class="contact-email">neelkamalweddingstories@gmail.com</a>, or submit the form below. We're looking forward to hearing from you!</p>
           </div>
           <form class="contact-form" data-reveal="" id="inquiry-form" novalidate="">
             <div class="form-row">
@@ -1227,8 +1227,7 @@
       <div>
         <div class="footer-brand">Neel <span>Kamal</span> Wedding Stories</div>
         <div class="footer-address">
-          <strong>Branch Office</strong> — 3rd Floor, Uma Shree, Beej Ka Godam Gulab Path, Chomu House, C-Scheme, Jaipur, Rajasthan-302001<br>
-          <strong>Head Office</strong> — Shop No. 25, Central Market, Khetri Nagar (Copper)
+          <strong>Head Office</strong> — Shop No. 25, Central Market, Khetri Nagar (Copper), Rajasthan
         </div>
       </div>
       <div>
@@ -1274,12 +1273,18 @@
       }
       window.addEventListener('scroll', onScroll, { passive: true });
 
-      function openMobile() { mobileNav.classList.add('open'); }
+      function openMobile() { if (window.innerWidth <= 768) mobileNav.classList.add('open'); }
       function closeMobile() { mobileNav.classList.remove('open'); }
 
       navToggle.addEventListener('click', openMobile);
       navClose.addEventListener('click', closeMobile);
       mobileLinks.forEach(function (a) { a.addEventListener('click', closeMobile); });
+      mobileNav.addEventListener('click', function (e) {
+        if (e.target === mobileNav) closeMobile();
+      });
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 768) closeMobile();
+      });
 
       /* ---- Scroll Reveal ---- */
       var revealEls = document.querySelectorAll('[data-reveal]');
