@@ -6,6 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rouge+Script&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0E0B0A;
@@ -36,6 +37,22 @@
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
+    body.loading { overflow: hidden; }
+
+    /* ---- Intro Preloader ---- */
+    .preloader {
+      position: fixed; inset: 0; z-index: 5000;
+      display: none; align-items: center; justify-content: center;
+      background: #000; overflow: hidden;
+      opacity: 1; transition: opacity 0.7s ease;
+    }
+    html.intro .preloader { display: flex; }
+    .preloader.done { opacity: 0; pointer-events: none; }
+    .preloader-video {
+      width: min(100%, 480px);
+      height: auto; aspect-ratio: 16 / 9;
+      object-fit: contain; background: #000;
+    }
 
     /* ---- Navigation ---- */
     .nav {
@@ -50,26 +67,22 @@
       box-shadow: 0 1px 0 var(--border);
     }
     .nav-logo {
-      font-family: var(--font-display); font-size: 15px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg);
-      text-decoration: none; white-space: nowrap;
+      display: flex; align-items: center;
+      text-decoration: none; line-height: 1;
     }
-    .nav-logo span { color: var(--accent); }
+    .nav-logo-img { height: 58px; width: auto; display: block; }
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a {
-      color: var(--muted); text-decoration: none; font-size: 14px;
+      color: var(--fg); text-decoration: none; font-size: 14px;
       letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s;
     }
-    .nav-links a:hover { color: var(--fg); }
-    .nav-cta {
-      padding: 10px 28px; border: 1px solid var(--accent); color: var(--accent);
-      background: transparent; border-radius: 2px; font-family: var(--font-body);
-      font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-      cursor: pointer; transition: all 0.3s;
+    .nav-links a:hover { color: var(--accent); }
+    .nav-toggle {
+      display: none; background: none; border: none; color: var(--fg);
+      cursor: pointer; padding: 8px; align-items: center; justify-content: center;
+      transition: color 0.3s;
     }
-    .nav-cta:hover { background: var(--accent); color: var(--bg); }
-    .nav-cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-    .nav-toggle { display: none; background: none; border: none; color: var(--fg); font-size: 24px; cursor: pointer; }
+    .nav-toggle:hover { color: var(--accent); }
 
     /* ---- Hero ---- */
     .hero {
@@ -239,22 +252,278 @@
     .pkg-btn:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 30px rgba(201,162,39,0.2); }
     .pkg-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-    /* ---- Testimonial ---- */
+    /* ---- Testimonial Carousel ---- */
     .testimonial { background: var(--bg); }
-    .quote-block {
-      max-width: 720px; margin: 0 auto; text-align: center; padding: 48px 24px;
-      position: relative;
+    .testimonial-carousel-wrap {
+      overflow: hidden; position: relative;
     }
-    .quote-mark {
-      font-family: var(--font-display); font-size: 120px; line-height: 0.5;
-      color: var(--accent); opacity: 0.4; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    .testimonial-track {
+      display: flex;
+      transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
     }
-    .quote-text {
-      font-family: var(--font-display); font-size: clamp(18px, 2.5vw, 24px);
-      font-style: italic; font-weight: 400; line-height: 1.8; color: var(--fg);
-      position: relative; z-index: 1; margin-bottom: 32px;
+    .testimonial-slide {
+      min-width: 100%; width: 100%; flex-shrink: 0;
+      display: grid; grid-template-columns: 1fr; gap: 20px;
+      text-align: center; box-sizing: border-box; padding: 0 24px;
     }
-    .quote-author { font-size: 14px; font-weight: 500; color: var(--accent); letter-spacing: 0.06em; }
+    .testimonial-content {
+      width: 100%; max-width: 600px; margin: 0 auto;
+    }
+    .testimonial-image-wrap {
+      aspect-ratio: 3/4; border-radius: 16px; overflow: hidden;
+      max-width: 200px; margin: 0 auto;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .testimonial-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .testimonial-label {
+      font-family: var(--font-body); font-size: 12px; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 16px; display: block;
+    }
+    .testimonial-quote {
+      font-family: var(--font-display); font-size: clamp(16px, 2vw, 22px);
+      font-weight: 400; font-style: italic; line-height: 1.5;
+      color: var(--fg); margin-bottom: 12px;
+    }
+    .testimonial-text {
+      font-size: 14px; font-weight: 300; line-height: 1.7;
+      color: var(--muted); max-width: 520px; margin: 0 auto 16px;
+    }
+    .testimonial-author {
+      font-family: var(--font-body); font-size: 12px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .testimonial-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(14,11,10,0.6);
+      color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s;
+      backdrop-filter: blur(8px);
+    }
+    .testimonial-arrow:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .testimonial-arrow-prev { left: 0; }
+    .testimonial-arrow-next { right: 0; }
+    .testimonial-dots {
+      display: flex; justify-content: center; gap: 12px; margin-top: 28px;
+    }
+    .testimonial-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent-dim); border: none; cursor: pointer;
+      transition: all 0.3s; padding: 0;
+    }
+    .testimonial-dot.active { background: var(--accent); transform: scale(1.2); }
+    @media (min-width: 768px) {
+      .testimonial-slide {
+        display: flex; justify-content: center; align-items: center;
+        gap: 48px; text-align: left; padding: 0;
+      }
+      .testimonial-image-wrap { flex-shrink: 0; max-width: 260px; margin: 0; }
+      .testimonial-content { max-width: 560px; margin: 0; text-align: left; }
+      .testimonial-text { margin: 0 0 16px; }
+    }
+    @media (max-width: 767px) {
+      .testimonial-arrow { width: 36px; height: 36px; }
+      .testimonial-image-wrap { max-width: 180px; }
+    }
+
+    /* ---- Instagram ---- */
+    .instagram { background: var(--surface); }
+    .instagram-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 40px;
+    }
+    .instagram-title {
+      font-family: var(--font-display); font-size: clamp(28px, 4vw, 44px);
+      font-weight: 400; color: var(--fg); margin-bottom: 8px;
+    }
+    .instagram-handle {
+      font-size: 12px; font-weight: 400; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .instagram-follow-btn {
+      display: inline-block; padding: 10px 28px;
+      border: 1px solid var(--accent); color: var(--accent);
+      background: transparent; border-radius: 2px;
+      font-family: var(--font-body); font-size: 12px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; cursor: pointer; transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .instagram-follow-btn:hover { background: var(--accent); color: var(--bg); }
+    .instagram-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .instagram-card {
+      aspect-ratio: 1/1;
+      border: none; padding: 0; background: none;
+      overflow: hidden; cursor: pointer; position: relative;
+    }
+    .instagram-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s, opacity 0.5s;
+    }
+    .instagram-card:hover img { transform: scale(1.08); opacity: 0.85; }
+    @media (max-width: 1024px) {
+      .instagram-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .instagram-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .instagram-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ---- Instagram Modal ---- */
+    .ig-modal-overlay {
+      position: fixed; inset: 0; z-index: 2500;
+      background: rgba(14,11,10,0.96);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    .ig-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .ig-modal {
+      position: relative; width: 100%; max-width: 1080px; max-height: 92vh;
+      display: grid; grid-template-columns: 7fr 5fr;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      transform: translateY(20px) scale(0.98);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .ig-modal-overlay.open .ig-modal { transform: translateY(0) scale(1); }
+    .ig-close {
+      position: absolute; top: 12px; right: 12px; z-index: 30;
+      background: rgba(14,11,10,0.7); border: 1px solid var(--border);
+      color: var(--fg); width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .ig-close:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .ig-image-col {
+      position: relative; background: #0a0808;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 420px; overflow: hidden;
+    }
+    .ig-image-col img {
+      max-height: 82vh; width: auto; max-width: 100%;
+      object-fit: contain; transition: transform 0.3s ease-out;
+    }
+    .ig-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
+      background: none; border: none; color: var(--accent);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s; opacity: 0.6;
+    }
+    .ig-arrow:hover { opacity: 1; color: var(--fg); }
+    .ig-arrow-prev { left: 8px; }
+    .ig-arrow-next { right: 8px; }
+    .ig-counter {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(14,11,10,0.7); border: 1px solid var(--border);
+      backdrop-filter: blur(8px); padding: 6px 14px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); white-space: nowrap;
+    }
+    .ig-details {
+      display: flex; flex-direction: column; min-height: 0;
+      background: var(--surface); border-left: 1px solid var(--border);
+    }
+    .ig-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .ig-avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      border: 1px solid var(--accent); padding: 2px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ig-avatar-inner {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: linear-gradient(135deg, var(--maroon), var(--ruby));
+      color: var(--accent); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; display: flex; align-items: center; justify-content: center;
+    }
+    .ig-username {
+      font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--fg); line-height: 1.3;
+    }
+    .ig-location {
+      font-family: var(--font-display); font-size: 12px; font-style: italic;
+      color: var(--muted); line-height: 1.3;
+    }
+    .ig-follow {
+      margin-left: auto; background: none; border: none; cursor: pointer;
+      color: var(--accent); font-size: 12px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.3s;
+    }
+    .ig-follow:hover { color: var(--fg); }
+    .ig-follow.following { color: var(--muted); }
+    .ig-body {
+      flex: 1; overflow-y: auto; padding: 20px;
+      scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+    }
+    .ig-body::-webkit-scrollbar { width: 4px; }
+    .ig-body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    .ig-post-title {
+      font-family: var(--font-display); font-size: 20px; font-style: italic;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .ig-caption {
+      font-size: 14px; font-weight: 300; line-height: 1.75;
+      color: var(--muted); margin-bottom: 20px;
+    }
+    .ig-comment { display: flex; gap: 10px; margin-bottom: 16px; }
+    .ig-comment-avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent-dim); border: 1px solid var(--border);
+    }
+    .ig-comment-user {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      color: var(--fg); margin-bottom: 2px;
+    }
+    .ig-comment-text { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; margin-bottom: 4px; }
+    .ig-comment-time { font-size: 10px; letter-spacing: 0.08em; color: var(--muted); opacity: 0.7; }
+    .ig-actions {
+      padding: 16px 20px; border-top: 1px solid var(--border);
+      background: rgba(26,20,18,0.6);
+    }
+    .ig-icon-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .ig-icons { display: flex; align-items: center; gap: 18px; }
+    .ig-icon {
+      background: none; border: none; color: var(--accent); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 2px;
+      transition: all 0.25s;
+    }
+    .ig-icon:hover { transform: scale(1.15); }
+    .ig-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .ig-icon.liked svg { fill: #E0245E; stroke: #E0245E; animation: igPop 0.3s ease; }
+    @keyframes igPop { 0% { transform: scale(0.6); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .ig-likes { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: var(--fg); margin-bottom: 14px; }
+    .ig-view-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px; text-decoration: none;
+      background: var(--maroon); color: var(--fg); border: 1px solid var(--border);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      transition: all 0.4s;
+    }
+    .ig-view-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .ig-view-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    @media (max-width: 768px) {
+      .ig-modal-overlay { padding: 0; }
+      .ig-modal {
+        grid-template-columns: 1fr; grid-template-rows: 40vh 60vh;
+        max-height: 100vh; border-radius: 0; border: none;
+      }
+      .ig-image-col { min-height: 0; height: 100%; }
+      .ig-image-col img { max-height: 100%; }
+      .ig-details { border-left: none; border-top: 1px solid var(--border); }
+      .ig-close { top: 10px; right: 10px; }
+      .ig-counter { bottom: 12px; }
+    }
 
     /* ---- Journey ---- */
     .journey { background: var(--surface); }
@@ -328,14 +597,16 @@
       max-width: var(--max-w); margin: 0 auto; padding: 64px 24px 32px;
       display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: start;
     }
-    .footer-brand { font-family: var(--font-display); font-size: 14px; font-weight: 500; letter-spacing: 0.08em; color: var(--fg); margin-bottom: 24px; }
-    .footer-brand span { color: var(--accent); }
+    .footer-brand {
+      font-family: 'Rouge Script', cursive;
+      font-size: 26px; font-weight: 400;
+      letter-spacing: 0.02em; text-transform: none;
+      color: #F4EBE0; margin-bottom: 24px;
+    }
+    .footer-brand span { color: #F4EBE0; }
     .footer-links { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; list-style: none; }
     .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.3s; }
     .footer-links a:hover { color: var(--fg); }
-    .footer-social { margin-bottom: 24px; }
-    .footer-social a { color: var(--muted); font-size: 13px; text-decoration: none; letter-spacing: 0.06em; transition: color 0.3s; }
-    .footer-social a:hover { color: var(--accent); }
     .footer-address { font-size: 13px; color: var(--muted); line-height: 1.8; max-width: 360px; }
     .footer-bottom {
       grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid var(--border);
@@ -344,6 +615,19 @@
     }
     .footer-bottom a { color: var(--muted); text-decoration: none; }
     .footer-bottom a:hover { color: var(--fg); }
+    .footer-social-icons {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .footer-social-icons a {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      border: 1px solid var(--border); border-radius: 50%;
+      color: var(--muted); transition: all 0.3s;
+    }
+    .footer-social-icons a svg { width: 15px; height: 15px; fill: currentColor; }
+    .footer-social-icons a:hover {
+      color: var(--accent); border-color: var(--accent); transform: translateY(-2px);
+    }
 
     /* ---- Gold hairline motif (section dividers) ---- */
     .motif-divider {
@@ -360,9 +644,125 @@
     [data-reveal] { opacity: 0; transform: translateY(24px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
     [data-reveal].revealed { opacity: 1; transform: translateY(0); }
 
+    /* ---- Tab Bar ---- */
+    .tab-bar {
+      display: flex; gap: 0; margin-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 16px 24px; border: none; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted); font-family: var(--font-body);
+      font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.3s; text-align: center;
+    }
+    .tab-btn:hover { color: var(--fg); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- Masonry Grid ---- */
+    .masonry-grid {
+      column-count: 3; column-gap: 16px;
+    }
+    .masonry-item {
+      break-inside: avoid; margin-bottom: 16px;
+      border-radius: 2px; overflow: hidden;
+      opacity: 0; transform: translateY(20px);
+      transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .tab-panel.active .masonry-item { opacity: 1; transform: translateY(0); }
+    .masonry-item:nth-child(1) { transition-delay: 0.05s; }
+    .masonry-item:nth-child(2) { transition-delay: 0.1s; }
+    .masonry-item:nth-child(3) { transition-delay: 0.15s; }
+    .masonry-item:nth-child(4) { transition-delay: 0.2s; }
+    .masonry-item:nth-child(5) { transition-delay: 0.25s; }
+    .masonry-item:nth-child(6) { transition-delay: 0.3s; }
+    .masonry-item:nth-child(7) { transition-delay: 0.35s; }
+    .masonry-item:nth-child(8) { transition-delay: 0.4s; }
+    .masonry-item {
+      cursor: pointer;
+    }
+    .masonry-item img {
+      width: 100%; display: block; border-radius: 2px;
+      transition: transform 0.4s, opacity 0.4s;
+    }
+    .masonry-item:hover img { transform: scale(1.03); opacity: 0.85; }
+
+    @media (max-width: 768px) {
+      .masonry-grid { column-count: 2; }
+      .tab-btn { font-size: 11px; padding: 14px 12px; }
+    }
+    @media (max-width: 480px) {
+      .masonry-grid { column-count: 1; }
+    }
+
+    /* ---- Modal Gallery ---- */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(14,11,10,0.95);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-content {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      position: relative; width: 100%;
+    }
+    .modal-image {
+      max-height: 72vh; max-width: 90vw; object-fit: contain;
+      border-radius: 4px; border: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.open .modal-image { animation: modalFadeIn 0.3s ease; }
+    @keyframes modalFadeIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-nav {
+      position: fixed; top: 50%; transform: translateY(-50%); z-index: 2001;
+      background: none; border: none; color: var(--accent);
+      font-size: 48px; cursor: pointer; padding: 16px;
+      transition: all 0.3s; line-height: 1;
+    }
+    .modal-nav:hover { filter: drop-shadow(0 0 10px var(--accent)); color: var(--fg); }
+    .modal-prev { left: 16px; }
+    .modal-next { right: 16px; }
+    .modal-close {
+      position: fixed; top: 16px; right: 24px; z-index: 2001;
+      background: none; border: none; color: var(--muted);
+      font-size: 36px; cursor: pointer; transition: color 0.3s; line-height: 1;
+    }
+    .modal-close:hover { color: var(--fg); }
+    .modal-thumbnails {
+      display: flex; gap: 8px; justify-content: center; align-items: center;
+      padding: 12px 16px; max-width: 90vw; overflow-x: auto;
+      scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+    }
+    .modal-thumbnails::-webkit-scrollbar { height: 4px; }
+    .modal-thumbnails::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    .modal-thumb {
+      width: 56px; height: 56px; object-fit: cover; border-radius: 4px;
+      border: 2px solid transparent; cursor: pointer; opacity: 0.5;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .modal-thumb:hover { opacity: 0.8; }
+    .modal-thumb.active { border-color: var(--accent); opacity: 1; transform: scale(1.05); }
+
+    @media (max-width: 768px) {
+      .modal-nav { font-size: 36px; padding: 12px; }
+      .modal-prev { left: 8px; }
+      .modal-next { right: 8px; }
+      .modal-image { max-height: 62vh; }
+      .modal-thumb { width: 48px; height: 48px; }
+      .modal-close { font-size: 30px; top: 12px; right: 16px; }
+    }
+    @media (max-width: 480px) {
+      .modal-nav { font-size: 28px; padding: 8px; }
+      .modal-image { max-height: 50vh; max-width: 95vw; }
+      .modal-thumb { width: 40px; height: 40px; }
+      .modal-thumbnails { gap: 6px; padding: 8px; }
+    }
+
     /* ---- Mobile Nav ---- */
     .mobile-nav {
-      display: none; position: fixed; inset: 0; z-index: 999;
+      display: none; position: fixed; inset: 0; z-index: 1500;
       background: rgba(14,11,10,0.96); backdrop-filter: blur(20px);
       flex-direction: column; align-items: center; justify-content: center; gap: 32px;
     }
@@ -372,7 +772,7 @@
       text-decoration: none; letter-spacing: 0.04em; transition: color 0.3s;
     }
     .mobile-nav a:hover { color: var(--accent); }
-    .mobile-nav-close { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--fg); font-size: 28px; cursor: pointer; }
+    .mobile-nav-close { position: absolute; top: 24px; right: 24px; z-index: 10; background: none; border: none; color: var(--fg); font-size: 28px; cursor: pointer; }
 
     /* ---- Counter animation ---- */
     .stat-number[data-count] { font-variant-numeric: tabular-nums; }
@@ -386,7 +786,8 @@
     @media (max-width: 768px) {
       .nav { padding: 0 20px; }
       .nav-links { display: none; }
-      .nav-toggle { display: block; }
+      .nav-toggle { display: flex; }
+      .nav-toggle svg { width: 20px; height: 15px; }
       .services-grid { grid-template-columns: 1fr; gap: 24px; }
       .packages-grid { grid-template-columns: 1fr; gap: 24px; }
       .impact-grid { grid-template-columns: 1fr; gap: 0; }
@@ -396,7 +797,10 @@
       .footer-inner { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .hero-title { font-size: clamp(32px, 8vw, 56px); }
-      .quote-mark { font-size: 80px; }
+    }
+    @media (min-width: 768px) {
+      :root { --nav-height: 104px; }
+      .nav-logo-img { height: 90px; }
     }
     @media (max-width: 480px) {
       .nav { padding: 0 16px; }
@@ -415,17 +819,34 @@
 </head>
 <body>
 
+  <script>
+    try {
+      if (!localStorage.getItem('nk-ws-intro')) {
+        document.documentElement.classList.add('intro');
+        document.body.classList.add('loading');
+      }
+    } catch (e) {}
+  </script>
+
+  <!-- Intro Preloader (first visit only) -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <video class="preloader-video" id="preloader-video" autoplay muted playsinline preload="auto" src="logo_intro.mp4"></video>
+  </div>
+
   <!-- Navigation -->
   <nav class="nav" data-nav="" id="main-nav">
-    <a href="#hero" class="nav-logo">Neel <span>Kamal</span> Wedding Stories</a>
+    <a href="#hero" class="nav-logo">
+      <img class="nav-logo-img" src="logo.png" alt="Neel Kamal Wedding Stories">
+    </a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
-      <li><a href="#impact">Work</a></li>
+      <li><a href="#craft">Work</a></li>
       <li><a href="#packages">Packages</a></li>
       <li></li>
     </ul>
-    <a href="#contact" class="nav-cta">Inquire</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">?</button>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+      <svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M1 2h24"/><path d="M1 10h24"/><path d="M1 18h24"/></svg>
+    </button>
   </nav>
 
   <!-- Mobile Nav -->
@@ -433,7 +854,7 @@
     <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">×</button>
     <a href="#hero" class="mobile-nav-link" data-nav-link="">Home</a>
     <a href="#about" class="mobile-nav-link" data-nav-link="">About</a>
-    <a href="#impact" class="mobile-nav-link" data-nav-link="">Work</a>
+    <a href="#craft" class="mobile-nav-link" data-nav-link="">Work</a>
     <a href="#packages" class="mobile-nav-link" data-nav-link="">Packages</a>
     <a href="#contact" class="mobile-nav-link" data-nav-link="">Inquire</a>
   </div>
@@ -450,34 +871,51 @@
       </div>
     </section>
 
-    <!-- About / Intro Strip -->
-    <section class="section about-strip" id="about">
+    <!-- Our Craft -->
+    <section class="section about-strip" id="craft">
       <div class="section-inner">
-        <p class="section-label" data-reveal="">About Us</p>
+        <p class="section-label" data-reveal="">What We Do</p>
         <h2 class="section-title" data-reveal="">Our Craft</h2>
         <div class="gold-divider" data-reveal=""></div>
-        <p class="about-intro" data-reveal="">We are passionate photographers dedicated to capturing stunning images — professional, stunning photos tailored to showcase your story.</p>
-        <div class="services-grid">
-          <div class="service-card" data-reveal="">
-            <div class="service-icon">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-7 8-7s8 3 8 7"></path><ellipse cx="12" cy="14" rx="8" ry="3"></ellipse></svg>
-            </div>
-            <h3 class="service-name">Wedding Photography</h3>
-            <p class="service-desc">Traditional and candid captures of your ceremonial moments, from the mandap to the first dance.</p>
+        <div class="tab-bar" data-reveal="">
+          <button class="tab-btn active" data-tab="wedding">Wedding Photography</button>
+          <button class="tab-btn" data-tab="candid">Candid Photography</button>
+          <button class="tab-btn" data-tab="cinematic">Cinematic Filming</button>
+        </div>
+        <div class="tab-panel active" id="tab-wedding">
+          <div class="masonry-grid">
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80" alt="Wedding ceremony" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding rings" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80" alt="Bride portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding decor" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=800&q=80" alt="Mandap ceremony" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding venue" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1546195643-70f48f9c5b87?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding flowers" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80" alt="Wedding couple" loading="lazy"></div>
           </div>
-          <div class="service-card" data-reveal="">
-            <div class="service-icon">
-              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="16" rx="2"></rect><circle cx="12" cy="10" r="3"></circle><path d="M4 16l4-4 4 3 5-5 6 6"></path></svg>
-            </div>
-            <h3 class="service-name">Candid Photography</h3>
-            <p class="service-desc">Unposed, authentic moments that tell the real story of your celebration and joy.</p>
+        </div>
+        <div class="tab-panel" id="tab-candid">
+          <div class="masonry-grid">
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&h=900&q=80" alt="Candid laughter" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80" alt="Natural moment" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&h=900&q=80" alt="Emotional portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" alt="Joyful moment" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=600&h=900&q=80" alt="Authentic smile" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80" alt="Candid portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=900&q=80" alt="Natural beauty" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80" alt="Candid group" loading="lazy"></div>
           </div>
-          <div class="service-card" data-reveal="">
-            <div class="service-icon">
-              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="16" rx="2"></rect><circle cx="8" cy="10" r="2"></circle><path d="M10 14l6-4v8l-6-4z"></path></svg>
-            </div>
-            <h3 class="service-name">Cinematic Filming</h3>
-            <p class="service-desc">Cinematic drone shots, AI-driven editing, and beautifully edited wedding films.</p>
+        </div>
+        <div class="tab-panel" id="tab-cinematic">
+          <div class="masonry-grid">
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=800&q=80" alt="Drone shot venue" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=900&q=80" alt="Cinematic portrait" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80" alt="Golden hour venue" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&h=900&q=80" alt="Cinematic bride" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1444021465936-c6ca81d39b84?auto=format&fit=crop&w=800&q=80" alt="Aerial wedding" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1546195643-70f48f9c5b87?auto=format&fit=crop&w=600&h=900&q=80" alt="Wedding bouquet" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1510076857177-7470076d4098?auto=format&fit=crop&w=600&h=900&q=80" alt="Cinematic decor" loading="lazy"></div>
+            <div class="masonry-item"><img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=800&q=80" alt="Drone landscape" loading="lazy"></div>
           </div>
         </div>
       </div>
@@ -502,90 +940,17 @@
       </div>
     </section>
 
-    <!-- Packages -->
-    <section class="section packages bg-maroon-wash" id="packages">
+    <!-- About Us -->
+    <section class="section about-strip" id="about">
       <div class="section-inner">
-        <p class="section-label" data-reveal="">Packages</p>
-        <h2 class="section-title" data-reveal="">Choose Your Celebration Plan</h2>
-        <div class="gold-divider" data-reveal=""></div>
-        <div class="packages-grid">
-          <div class="pkg-card" data-reveal="">
-            <h3 class="pkg-tier">Silver</h3>
-            <div class="pkg-price">₹85,000 INR</div>
-            <p class="pkg-desc">A simple yet elegant package covering all essential wedding moments.</p>
-            <ul class="pkg-services">
-              <li>Traditional Photography &amp; Videography</li>
-              <li>Full Traditional Wedding Video (4 Hours)</li>
-              <li>2 Premium Photobooks (500 Photos)</li>
-              <li>All Raw Data Provided</li>
-            </ul>
-            <button class="pkg-btn" data-package="Silver">Book</button>
-          </div>
-          <div class="pkg-card featured" data-reveal="">
-            <h3 class="pkg-tier">Gold</h3>
-            <div class="pkg-price">₹160,000 INR</div>
-            <p class="pkg-desc">A perfect balance of elegance and technology, ensuring comprehensive coverage of your wedding day.</p>
-            <ul class="pkg-services">
-              <li>Traditional Photography &amp; Videography</li>
-              <li>Candid Photography &amp; Cinematic Filming</li>
-              <li>Aerial Dronography</li>
-              <li>AI Face Recognition for Guest Convenience</li>
-              <li>5 LED Frames Displaying Photos on Wedding Day</li>
-              <li>Full Traditional Wedding Video (4 Hours)</li>
-              <li>2 Premium Photobooks (500 Photos)</li>
-              <li>Cinematic Wedding Short Film</li>
-              <li>Instagram Reels for Quick Sharing</li>
-              <li>5 LED Frame Photos, All Raw Data Provided</li>
-            </ul>
-            <button class="pkg-btn" data-package="Gold">Book</button>
-          </div>
-          <div class="pkg-card" data-reveal="">
-            <h3 class="pkg-tier">Platinum</h3>
-            <div class="pkg-price">₹250,000 INR</div>
-            <p class="pkg-desc">Our most premium offering, designed for an unforgettable wedding experience with cutting-edge technology.</p>
-            <ul class="pkg-services">
-              <li>Pre-Wedding Shoot</li>
-              <li>Traditional Photography &amp; Videography</li>
-              <li>Candid Photography &amp; Cinematic Filming</li>
-              <li>Aerial Dronography</li>
-              <li>AI Face Recognition</li>
-              <li>Instant Photo Prints for Guests</li>
-              <li>10 LED Frames Displaying Photos on Wedding Day</li>
-              <li>Pre-Wedding Shoot Video (2 Songs)</li>
-              <li>Full Traditional Wedding Video (4 Hours)</li>
-              <li>2 Premium Photobooks + Mini Photobook</li>
-              <li>Cinematic Wedding Short Film, Same-Day Instagram Reel</li>
-              <li>10 LED Frame Photos, All Raw Data Provided</li>
-            </ul>
-            <button class="pkg-btn" data-package="Platinum">Book</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonial -->
-    <section class="section testimonial">
-      <div class="section-inner">
-        <div class="quote-block">
-          <span class="quote-mark" aria-hidden="true">“</span>
-          <blockquote class="quote-text">
-            The photos exceeded my expectations! Every detail was perfectly captured, and the quality was outstanding. The team was professional, friendly and made the entire process enjoyable. Highly recommend!
-          </blockquote>
-          <cite class="quote-author">— Lokesh Sharma, Business Owner</cite>
-        </div>
-      </div>
-    </section>
-
-    <!-- Our Journey -->
-    <section class="section journey" id="about-journey">
-      <div class="section-inner">
-        <p class="section-label" data-reveal="">Our Journey</p>
+        <p class="section-label" data-reveal="">About Us</p>
         <h2 class="section-title" data-reveal="">The Neel Kamal Legacy</h2>
         <div class="gold-divider" data-reveal=""></div>
+        <p class="about-intro" data-reveal="">We are passionate photographers dedicated to capturing stunning images — professional, stunning photos tailored to showcase your story.</p>
         <div class="journey-grid">
           <div class="journey-text" data-reveal="">
             <p>At Neel Kamal Wedding Stories, we believe every love story is unique — and your wedding photos should reflect that.</p>
-            <p>For over <span class="highlight">50 years</span>, we have blended candid storytelling with elegant portraiture, capturing weddings across Rajasthan with a warm, authentic, and timeless style.</p>
+            <p>For over <span class="highlight">50 years</span>, we have blended candid storytelling with elegant portraiture, capturing weddings across India with a warm, authentic, and timeless style.</p>
             <p>From the gentle glow of diyas to the vibrant marigold arches, our lens finds the moments that matter most.</p>
             <div class="team-strip">
               <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Team member" class="team-photo" loading="lazy">
@@ -602,6 +967,157 @@
       </div>
     </section>
 
+    <!-- Packages -->
+    <section class="section packages bg-maroon-wash" id="packages">
+      <div class="section-inner">
+        <p class="section-label" data-reveal="">Packages</p>
+        <h2 class="section-title" data-reveal="">Choose Your Celebration Plan</h2>
+        <div class="gold-divider" data-reveal=""></div>
+        <div class="packages-grid">
+          <div class="pkg-card" data-reveal="">
+            <h3 class="pkg-tier">Silver</h3>
+            <div class="pkg-price">₹85,000 INR</div>
+            <p class="pkg-desc">A simple yet elegant package covering all essential wedding moments.</p>
+            <ul class="pkg-services">
+              <li>Traditional Photography &amp; Videography</li>
+              <li>Full Traditional Wedding Video (4 Hours)</li>
+              <li>2 Premium Photobooks (500 Photos)</li>
+              <li>All Raw Data Provided (at Client Storage)</li>
+            </ul>
+            <button class="pkg-btn" data-package="Silver">Book</button>
+          </div>
+          <div class="pkg-card featured" data-reveal="">
+            <h3 class="pkg-tier">Gold</h3>
+            <div class="pkg-price">₹160,000 INR</div>
+            <p class="pkg-desc">A perfect balance of elegance and technology, ensuring comprehensive coverage of your wedding day.</p>
+            <ul class="pkg-services">
+              <li>Traditional Photography &amp; Videography</li>
+              <li>Candid Photography &amp; Cinematic Filming</li>
+              <li>Aerial Dronography</li>
+              <li>5 LED Frames Displaying Photos on Wedding Day</li>
+              <li>Full Traditional Wedding Video (4 Hours)</li>
+              <li>2 Premium Photobooks (500 Photos)</li>
+              <li>Cinematic Wedding Short Film</li>
+              <li>Instagram Reels for Quick Sharing</li>
+              <li>5 LED Frame Photos</li>
+              <li>All Raw Data Provided (at Client Storage)</li>
+            </ul>
+            <button class="pkg-btn" data-package="Gold">Book</button>
+          </div>
+          <div class="pkg-card" data-reveal="">
+            <h3 class="pkg-tier">Platinum</h3>
+            <div class="pkg-price">₹250,000 INR</div>
+            <p class="pkg-desc">Our most premium offering, designed for an unforgettable wedding experience with cutting-edge technology.</p>
+            <ul class="pkg-services">
+              <li>Pre-Wedding Shoot</li>
+              <li>Traditional Photography &amp; Videography</li>
+              <li>Candid Photography &amp; Cinematic Filming</li>
+              <li>Aerial Dronography</li>
+              <li>AI Face Recognition for Guest Convenience</li>
+              <li>10 LED Frames Displaying Photos on Wedding Day</li>
+              <li>Pre-Wedding Shoot Video (2 Songs)</li>
+              <li>Full Traditional Wedding Video (4 Hours)</li>
+              <li>2 Premium Photobooks + Mini Photobook</li>
+              <li>Cinematic Wedding Short Film, Same-Day Instagram Reel</li>
+              <li>10 LED Frame Photos</li>
+              <li>All Raw Data Provided (at Client Storage)</li>
+            </ul>
+            <button class="pkg-btn" data-package="Platinum">Book</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="section testimonial">
+      <div class="section-inner" style="position: relative;">
+        <p class="section-label" data-reveal="">Testimonials</p>
+        <h2 class="section-title" data-reveal="">What Our Clients Say</h2>
+        <div class="gold-divider" data-reveal=""></div>
+        <div class="testimonial-carousel-wrap">
+          <div class="testimonial-track" id="testimonial-track">
+            <div class="testimonial-slide">
+              <div class="testimonial-image-wrap">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&h=750&q=80" alt="Lokesh Sharma" loading="lazy">
+              </div>
+              <div class="testimonial-content">
+                <div class="testimonial-quote">"The photos exceeded my expectations! Every detail was perfectly captured, and the quality was outstanding."</div>
+                <p class="testimonial-text">The team was professional, friendly and made the entire process enjoyable. Highly recommend!</p>
+                <div class="testimonial-author">— Lokesh Sharma, Business Owner</div>
+              </div>
+            </div>
+            <div class="testimonial-slide">
+              <div class="testimonial-image-wrap">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=750&q=80" alt="Ananya Singh" loading="lazy">
+              </div>
+              <div class="testimonial-content">
+                <div class="testimonial-quote">"The attention to detail and the way they handled the lighting during our sunset ceremony was magical. They are truly masters of their craft."</div>
+                <p class="testimonial-text">From the first consultation to the final delivery, everything was flawless. We felt like royalty.</p>
+                <div class="testimonial-author">— Ananya Singh, Jaipur</div>
+              </div>
+            </div>
+            <div class="testimonial-slide">
+              <div class="testimonial-image-wrap">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&h=750&q=80" alt="Priya and Rahul" loading="lazy">
+              </div>
+              <div class="testimonial-content">
+                <div class="testimonial-quote">"They captured every emotion perfectly — from the nervous excitement before the pheras to the joy of the celebration."</div>
+                <p class="testimonial-text">Our family treasures these memories. The candid shots of our parents' reactions are priceless.</p>
+                <div class="testimonial-author">— Priya &amp; Rahul, Udaipur</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="testimonial-arrow testimonial-arrow-prev" id="test-prev" aria-label="Previous">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="testimonial-arrow testimonial-arrow-next" id="test-next" aria-label="Next">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
+        <div class="testimonial-dots" id="test-dots">
+          <button class="testimonial-dot active" data-index="0" aria-label="Slide 1"></button>
+          <button class="testimonial-dot" data-index="1" aria-label="Slide 2"></button>
+          <button class="testimonial-dot" data-index="2" aria-label="Slide 3"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Instagram -->
+    <section class="section instagram" id="instagram">
+      <div class="section-inner">
+        <div class="instagram-header">
+          <div>
+            <h2 class="instagram-title">Check Out Our Instagram</h2>
+            <p class="instagram-handle">@weddingsbyneelkamal</p>
+          </div>
+          <a href="https://instagram.com/weddingsbyneelkamal" target="_blank" rel="noopener" class="instagram-follow-btn">Follow Us</a>
+        </div>
+        <div class="instagram-grid">
+          <button class="instagram-card" aria-label="View post" data-location="The Rambagh Palace, Jaipur" data-title="Capturing the Eternal Glow" data-caption="A timeless frame from the royal nuptials at Rambagh Palace. Every stitch of the heritage lehenga tells a story of generations past. #WeddingPhotography #RoyalWedding #JaipurHeritage">
+            <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Udaipur, Lake Pichola" data-title="Two Rings, One Promise" data-caption="The rings that began it all — a quiet moment of gold and light before the ceremony began. #WeddingRings #Udaipur #ForeverStartsHere">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="The Oberoi, New Delhi" data-title="The Bride in Bloom" data-caption="A portrait study of the bride — soft window light, heirloom jewels, and the calm before the celebration. #BridePortrait #GoldenHour #WeddingEditorial">
+            <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Haveli Courtyard, Jaipur" data-title="Details of a Dream" data-caption="Marigold, rose and hand-worked silk — every detail of the decor was a labour of love. #WeddingDecor #DestinationWedding #IndianWedding">
+            <img src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Village Garden, Goa" data-title="Petals and Promises" data-caption="Soft morning light across the floral altar — the kind of frame you feel before you photograph. #WeddingFlowers #BohoWedding #GoaWedding">
+            <img src="https://images.unsplash.com/photo-1546195643-70f48f9c5b87?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+          <button class="instagram-card" aria-label="View post" data-location="Fort Grounds, Jodhpur" data-title="A Grand Welcome" data-caption="Aerial view of the mandap at golden hour — from above, a wedding looks like a work of art. #DroneWedding #AerialPhotography #Jodhpur">
+            <img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=400&h=400&q=80" alt="Wedding moment" loading="lazy">
+          </button>
+        </div>
+      </div>
+    </section>
+
+
     <!-- Contact -->
     <section class="section contact" id="contact">
       <div class="section-inner">
@@ -610,7 +1126,7 @@
         <div class="gold-divider" data-reveal=""></div>
         <div class="contact-layout">
           <div class="contact-info" data-reveal="">
-            <p>Have a question or want to book a media session with me? Send a text, give me a call, email me at <a href="mailto:weddingsbyneelkamal@gmail.com" class="contact-email">weddingsbyneelkamal@gmail.com</a>, or submit the form below. I'm looking forward to hearing from you!</p>
+            <p>Have a question or want to book a media session with us? Send a text, give us a call, email us at <a href="mailto:neelkamalweddingstories@gmail.com" class="contact-email">neelkamalweddingstories@gmail.com</a>, or submit the form below. We're looking forward to hearing from you!</p>
           </div>
           <form class="contact-form" data-reveal="" id="inquiry-form" novalidate="">
             <div class="form-row">
@@ -651,6 +1167,89 @@
         </div>
       </div>
     </section>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay" id="image-modal">
+      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <button class="modal-nav modal-prev" id="modal-prev" aria-label="Previous">‹</button>
+      <button class="modal-nav modal-next" id="modal-next" aria-label="Next">›</button>
+      <div class="modal-content">
+        <img class="modal-image" id="modal-image" src="" alt="">
+        <div class="modal-thumbnails" id="modal-thumbnails"></div>
+      </div>
+    </div>
+
+    <!-- Instagram Modal -->
+    <div class="ig-modal-overlay" id="ig-modal" role="dialog" aria-label="Instagram post">
+      <div class="ig-modal">
+        <button class="ig-close" id="ig-close" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="ig-image-col">
+          <button class="ig-arrow ig-arrow-prev" id="ig-prev" aria-label="Previous">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="ig-arrow ig-arrow-next" id="ig-next" aria-label="Next">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <img id="ig-image" src="" alt="Instagram post">
+          <div class="ig-counter"><span id="ig-counter-text">Image 1/6</span></div>
+        </div>
+        <div class="ig-details">
+          <div class="ig-header">
+            <div class="ig-avatar"><div class="ig-avatar-inner">NK</div></div>
+            <div>
+              <div class="ig-username">weddingsbyneelkamal</div>
+              <div class="ig-location" id="ig-location">Jaipur, India</div>
+            </div>
+            <button class="ig-follow" id="ig-follow">Follow</button>
+          </div>
+          <div class="ig-body">
+            <h2 class="ig-post-title" id="ig-title">Capturing the Eternal Glow</h2>
+            <p class="ig-caption" id="ig-caption">Every frame tells a story of generations past.</p>
+            <div class="ig-comment">
+              <div class="ig-comment-avatar"></div>
+              <div>
+                <div class="ig-comment-user">VOGUEWEDDINGS</div>
+                <div class="ig-comment-text">The composition and lighting here are absolutely peerless. Truly captured the soul of Rajasthan.</div>
+                <div class="ig-comment-time">2H AGO &bull; REPLY</div>
+              </div>
+            </div>
+            <div class="ig-comment">
+              <div class="ig-comment-avatar"></div>
+              <div>
+                <div class="ig-comment-user">HERITAGE_ARCHIVE</div>
+                <div class="ig-comment-text">Exceptional work, Neel. The gold thread detail is incredible.</div>
+                <div class="ig-comment-time">5H AGO &bull; REPLY</div>
+              </div>
+            </div>
+          </div>
+          <div class="ig-actions">
+            <div class="ig-icon-row">
+              <div class="ig-icons">
+                <button class="ig-icon" id="ig-like" aria-label="Like">
+                  <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </button>
+                <button class="ig-icon" aria-label="Comment">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </button>
+                <button class="ig-icon" aria-label="Share">
+                  <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+              </div>
+              <button class="ig-icon" id="ig-bookmark" aria-label="Save">
+                <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              </button>
+            </div>
+            <p class="ig-likes" id="ig-likes">1,428 LIKES</p>
+            <a class="ig-view-btn" href="https://www.instagram.com/weddingsbyneelkamal" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+              View On Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -658,24 +1257,31 @@
     <div class="footer-inner">
       <div>
         <div class="footer-brand">Neel <span>Kamal</span> Wedding Stories</div>
-        <div class="footer-social">
-          <a href="https://instagram.com/weddingsbyneelkamal" target="_blank" rel="noopener">Check out our Instagram</a>
-        </div>
         <div class="footer-address">
-          <strong>Branch Office</strong> — 3rd Floor, Uma Shree, Beej Ka Godam Gulab Path, Chomu House, C-Scheme, Jaipur, Rajasthan-302001<br>
-          <strong>Head Office</strong> — Shop No. 25, Central Market, Khetri Nagar (Copper)
+          <strong>Head Office</strong> — Shop No. 25, Central Market, Khetri Nagar (Copper), Rajasthan
         </div>
       </div>
       <div>
         <ul class="footer-links">
           <li><a href="#about">About</a></li>
-          <li><a href="#impact">Work</a></li>
+          <li><a href="#craft">Work</a></li>
           <li><a href="#packages">Packages</a></li>
           <li><a href="#contact">Inquire</a></li>
         </ul>
       </div>
       <div class="footer-bottom">
         <span>© 2025 by Weddingsbyneelkamal · <a href="#">Terms &amp; Conditions</a></span>
+        <div class="footer-social-icons">
+          <a href="https://www.youtube.com/@weddingsbyneelkamal" target="_blank" rel="noopener" aria-label="YouTube">
+            <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/weddingsbyneelkamal" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="https://facebook.com/neelkamalweddingstories" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
         <span>Website by: Aditya Mishra</span>
       </div>
     </div>
@@ -683,6 +1289,39 @@
 
   <script>
     (function () {
+      /* ---- Intro Preloader (first visit only) ---- */
+      var preloader = document.getElementById('preloader');
+      var introVideo = document.getElementById('preloader-video');
+      var isIntro = document.documentElement.classList.contains('intro');
+
+      function finishIntro() {
+        if (!preloader || preloader.classList.contains('done')) return;
+        preloader.classList.add('done');
+        document.body.classList.remove('loading');
+        try { localStorage.setItem('nk-ws-intro', '1'); } catch (e) {}
+        setTimeout(function () {
+          if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader);
+        }, 800);
+      }
+
+      if (isIntro) {
+        var introStarted = false;
+        function startIntro() {
+          if (introStarted) return;
+          introStarted = true;
+          if (!introVideo) { finishIntro(); return; }
+          var p = introVideo.play();
+          if (p && p.catch) p.catch(function () { finishIntro(); });
+        }
+        introVideo.addEventListener('canplay', startIntro, { once: true });
+        introVideo.addEventListener('ended', finishIntro, { once: true });
+        introVideo.addEventListener('error', finishIntro, { once: true });
+        setTimeout(startIntro, 150);
+        setTimeout(finishIntro, 11500);
+      } else if (document.body.classList.contains('loading')) {
+        document.body.classList.remove('loading');
+      }
+
       var nav = document.getElementById('main-nav');
       var mobileNav = document.getElementById('mobile-nav');
       var navToggle = document.getElementById('nav-toggle');
@@ -698,12 +1337,18 @@
       }
       window.addEventListener('scroll', onScroll, { passive: true });
 
-      function openMobile() { mobileNav.classList.add('open'); }
+      function openMobile() { if (window.innerWidth <= 768) mobileNav.classList.add('open'); }
       function closeMobile() { mobileNav.classList.remove('open'); }
 
       navToggle.addEventListener('click', openMobile);
       navClose.addEventListener('click', closeMobile);
       mobileLinks.forEach(function (a) { a.addEventListener('click', closeMobile); });
+      mobileNav.addEventListener('click', function (e) {
+        if (e.target === mobileNav) closeMobile();
+      });
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 768) closeMobile();
+      });
 
       /* ---- Scroll Reveal ---- */
       var revealEls = document.querySelectorAll('[data-reveal]');
@@ -775,6 +1420,220 @@
           setTimeout(function () { msg.value = saved; msg.style.color = ''; }, 3500);
         }
         form.reset();
+      });
+
+      /* ---- Tab Switching ---- */
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tab = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+          document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+          btn.classList.add('active');
+          document.getElementById('tab-' + tab).classList.add('active');
+        });
+      });
+
+      /* ---- Modal Gallery ---- */
+      var modalOverlay = document.getElementById('image-modal');
+      var modalImage = document.getElementById('modal-image');
+      var modalThumbnails = document.getElementById('modal-thumbnails');
+      var modalPrev = document.getElementById('modal-prev');
+      var modalNext = document.getElementById('modal-next');
+      var modalClose = document.getElementById('modal-close');
+      var modalImages = [];
+      var modalIndex = 0;
+
+      document.querySelectorAll('.masonry-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+          var panel = item.closest('.tab-panel');
+          if (!panel) return;
+          var imgs = panel.querySelectorAll('.masonry-item img');
+          modalImages = [];
+          imgs.forEach(function (img) { modalImages.push(img.getAttribute('src')); });
+          var items = panel.querySelectorAll('.masonry-item');
+          items.forEach(function (ci, i) { if (ci === item) modalIndex = i; });
+          openModal();
+        });
+      });
+
+      function openModal() {
+        if (modalImages.length === 0) return;
+        updateModalImage();
+        buildThumbnails();
+        modalOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modalOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function updateModalImage() {
+        modalImage.setAttribute('src', modalImages[modalIndex]);
+        var thumbs = modalThumbnails.querySelectorAll('.modal-thumb');
+        thumbs.forEach(function (t, i) {
+          t.classList.toggle('active', i === modalIndex);
+          if (i === modalIndex) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        });
+      }
+
+      function buildThumbnails() {
+        modalThumbnails.innerHTML = '';
+        modalImages.forEach(function (src, i) {
+          var thumb = document.createElement('img');
+          thumb.setAttribute('src', src);
+          thumb.setAttribute('data-index', i);
+          thumb.className = 'modal-thumb' + (i === modalIndex ? ' active' : '');
+          thumb.addEventListener('click', function () {
+            modalIndex = parseInt(thumb.getAttribute('data-index'), 10);
+            updateModalImage();
+          });
+          modalThumbnails.appendChild(thumb);
+        });
+      }
+
+      function prevImage() {
+        modalIndex = (modalIndex - 1 + modalImages.length) % modalImages.length;
+        updateModalImage();
+      }
+
+      function nextImage() {
+        modalIndex = (modalIndex + 1) % modalImages.length;
+        updateModalImage();
+      }
+
+      modalPrev.addEventListener('click', prevImage);
+      modalNext.addEventListener('click', nextImage);
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function (e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!modalOverlay.classList.contains('open')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
+      });
+
+      /* ---- Testimonial Carousel ---- */
+      var testTrack = document.getElementById('testimonial-track');
+      var testSlides = testTrack.children;
+      var testDots = document.querySelectorAll('#test-dots .testimonial-dot');
+      var testPrev = document.getElementById('test-prev');
+      var testNext = document.getElementById('test-next');
+      var testCurrent = 0;
+
+      function testShow(index) {
+        testCurrent = (index + testSlides.length) % testSlides.length;
+        testTrack.style.transform = 'translateX(-' + (testCurrent * 100) + '%)';
+        testDots.forEach(function (d, i) { d.classList.toggle('active', i === testCurrent); });
+      }
+
+      function testNextSlide() { testShow(testCurrent + 1); }
+      function testPrevSlide() { testShow(testCurrent - 1); }
+
+      testNext.addEventListener('click', testNextSlide);
+      testPrev.addEventListener('click', testPrevSlide);
+      testDots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          testShow(parseInt(dot.getAttribute('data-index'), 10));
+        });
+      });
+
+      /* ---- Instagram Modal ---- */
+      var igOverlay = document.getElementById('ig-modal');
+      var igImage = document.getElementById('ig-image');
+      var igLocation = document.getElementById('ig-location');
+      var igTitle = document.getElementById('ig-title');
+      var igCaption = document.getElementById('ig-caption');
+      var igCounter = document.getElementById('ig-counter-text');
+      var igPrev = document.getElementById('ig-prev');
+      var igNext = document.getElementById('ig-next');
+      var igClose = document.getElementById('ig-close');
+      var igFollow = document.getElementById('ig-follow');
+      var igLike = document.getElementById('ig-like');
+      var igBookmark = document.getElementById('ig-bookmark');
+      var igLikes = document.getElementById('ig-likes');
+      var igFrame = document.querySelector('#ig-modal .ig-image-col');
+      var igCards = document.querySelectorAll('.instagram-card');
+      var igData = [];
+      var igIndex = 0;
+      var igLiked = false;
+
+      igCards.forEach(function (card) {
+        igData.push({
+          src: card.querySelector('img').getAttribute('src'),
+          location: card.getAttribute('data-location') || 'Jaipur, India',
+          title: card.getAttribute('data-title') || 'Capturing Moments of Love',
+          caption: card.getAttribute('data-caption') || 'Every frame tells a story of generations past.'
+        });
+      });
+
+      function igOpen(index) {
+        if (igData.length === 0) return;
+        igIndex = index;
+        igUpdate();
+        igOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function igCloseModal() {
+        igOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function igUpdate() {
+        var d = igData[igIndex];
+        igImage.setAttribute('src', d.src);
+        igLocation.textContent = d.location;
+        igTitle.textContent = d.title;
+        igCaption.textContent = d.caption;
+        igCounter.textContent = 'Image ' + (igIndex + 1) + '/' + igData.length;
+      }
+
+      function igPrevImage() { igIndex = (igIndex - 1 + igData.length) % igData.length; igUpdate(); }
+      function igNextImage() { igIndex = (igIndex + 1) % igData.length; igUpdate(); }
+
+      igCards.forEach(function (card, i) {
+        card.addEventListener('click', function () { igOpen(i); });
+      });
+      igPrev.addEventListener('click', igPrevImage);
+      igNext.addEventListener('click', igNextImage);
+      igClose.addEventListener('click', igCloseModal);
+      igOverlay.addEventListener('click', function (e) {
+        if (e.target === igOverlay) igCloseModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!igOverlay.classList.contains('open')) return;
+        if (e.key === 'Escape') igCloseModal();
+        if (e.key === 'ArrowLeft') igPrevImage();
+        if (e.key === 'ArrowRight') igNextImage();
+      });
+
+      igFollow.addEventListener('click', function () {
+        var following = igFollow.classList.toggle('following');
+        igFollow.textContent = following ? 'Following' : 'Follow';
+      });
+      igLike.addEventListener('click', function () {
+        igLiked = !igLiked;
+        igLike.classList.toggle('liked', igLiked);
+        igLikes.textContent = igLiked ? '1,429 LIKES' : '1,428 LIKES';
+      });
+      igBookmark.addEventListener('click', function () {
+        igBookmark.classList.toggle('liked');
+      });
+
+      var igImg = igFrame.querySelector('img');
+      igFrame.addEventListener('mousemove', function (e) {
+        var rect = igFrame.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width - 0.5;
+        var y = (e.clientY - rect.top) / rect.height - 0.5;
+        igImg.style.transform = 'scale(1.02) translate(' + (x * 10) + 'px,' + (y * 10) + 'px)';
+      });
+      igFrame.addEventListener('mouseleave', function () {
+        igImg.style.transform = '';
       });
 
       /* ---- Smooth scroll for anchor links ---- */
