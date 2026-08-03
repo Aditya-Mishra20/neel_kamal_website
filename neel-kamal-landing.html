@@ -70,7 +70,7 @@
       display: flex; align-items: center;
       text-decoration: none; line-height: 1;
     }
-    .nav-logo-img { height: 48px; width: auto; display: block; }
+    .nav-logo-img { height: 58px; width: auto; display: block; }
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a {
       color: var(--fg); text-decoration: none; font-size: 14px;
@@ -799,7 +799,8 @@
       .hero-title { font-size: clamp(32px, 8vw, 56px); }
     }
     @media (min-width: 768px) {
-      .nav-logo-img { height: 52px; }
+      :root { --nav-height: 104px; }
+      .nav-logo-img { height: 90px; }
     }
     @media (max-width: 480px) {
       .nav { padding: 0 16px; }
